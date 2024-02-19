@@ -152,8 +152,12 @@ detect_mac80211() {
 	config_foreach check_devidx wifi-device
 
 	json_load_file /etc/board.json
+	# if an argument is provided, configure only that device.
+	# Otherwise, configure all unconfigured devices.
+	devs=/sys/class/ieee80211/$1
+	[ -n "$devs" ] || devs=/sys/class/ieee80211/*
 
-	for _dev in /sys/class/ieee80211/*; do
+	for _dev in $devs; do
 		[ -e "$_dev" ] || continue
 
 		dev="${_dev##*/}"

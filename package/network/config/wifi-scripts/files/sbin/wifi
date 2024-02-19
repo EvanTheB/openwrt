@@ -181,7 +181,9 @@ wifi_config() {
 
 	for driver in $DRIVERS; do (
 		if eval "type detect_$driver" 2>/dev/null >/dev/null; then
-			eval "detect_$driver" || echo "$driver: Detect failed" >&2
+			# if an argument is provided, configure only that device.
+			# Otherwise, configure all unconfigured devices.
+			eval "detect_$driver" $1 || echo "$driver: Detect failed" >&2
 		else
 			echo "$driver: Hardware detection not supported" >&2
 		fi
@@ -261,7 +263,7 @@ scan_wifi
 case "$1" in
 	down) wifi_updown "disable" "$2";;
 	detect) wifi_detect_notice ;;
-	config) wifi_config ;;
+	config) wifi_config "$2";;
 	status) ubus_wifi_cmd "status" "$2";;
 	isup) wifi_isup "$2"; exit $?;;
 	reload) wifi_reload "$2";;
